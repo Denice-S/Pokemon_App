@@ -1,62 +1,37 @@
-var apiUrl = "https://pokeapi.co/api/v2/pokemon/";
-var input = document.querySelector(".pokemon-input");
-var pokemonName = document.querySelector(".pokemon-name");
-var pokemonImage = document.querySelector(".pokemon-image");
-var pokemonHeight =document.querySelector(".pokemon-height");
-var pokemonWeight=document.querySelector(".pokemon-weight");
-var pokeType1=document.querySelector(".pokemon-type1");
-var pokeType2=document.querySelector(".pokemon-type2");
-var pokeAbility1=document.querySelector(".pokemon-ability1");
-var pokeAbility2=document.querySelector(".pokemon-ability2");
+const chooseButton = document.querySelector(".chooseButton");
+const reset = document.querySelector(".reset");
+const flipped = document.querySelector(".flip-card-inner");
+const input = document.querySelector(".pokemon-input");
+const api = "https://pokeapi.co/api/v2/pokemon/";
+const pokemonName = document.querySelector(".pokemon-name")
+const pokemonImage = document.querySelector(".pokemon-image");
+const pokemonAbility = document.querySelector(".pokemon-ability")
+const pokemonType = document.querySelector(".pokemon-type")
 
+async function getPokemonData() {
+    try {
+        await axios.get(api + input.value)
+            .then((response) => {
+                pokemonImage.src = response.data.sprites.front_default;
+                const pokeName = response.data.forms[0].name;
+                pokemonName.innerHTML = pokeName.charAt(0).toUpperCase() + pokeName.slice(1);
+                pokemonAbility.innerHTML = `<b>Abilities:-</b>${response.data.abilities[0].ability.name},<br> ${response.data.abilities[1].ability.name}`;
+                const pokeType = response.data.types[0].type.name;
+                pokemonType.innerHTML = `<b> Type:-</b> ${pokeType.charAt(0).toUpperCase() + pokeType.slice(1)} Pokemon`;
 
-function getPokemonData() {
-    axios.get(apiUrl + input.value)
-    .then(function (response) {
-        console.log(response.data);
-        pokemonName.innerHTML = response.data.forms[0].name;
-        pokemonImage.src = response.data.sprites.front_default;
+            })
 
-        var pokemonType1 = response.data.types[0].type.name;
-        if (response.data.types.length == 2) {
-            var pokemonType2 = response.data.types[1].type.name;
-        }
-        else var pokemonType2 = null;
-
-        pokeType1.innerHTML=pokemonType1
-        pokeType2.innerHTML=pokemonType2
-        pokemonHeight.innerHTML=response.data.height;
-        pokemonWeight.innerHTML = response.data.weight;
-        var pokemonAbility1 = response.data.abilities[0].ability.name;
-        if (response.data.abilities.length == 2) {
-            var pokemonAbility2 = response.data.abilities[1].ability.name;
-        }
-        else var pokemonAbility2 = null;
-        // console.log("Ability 1: ", pokemonAbility1);
-        // console.log("Ability 2: ", pokemonAbility2);
-        pokeAbility1.innerHTML=pokemonAbility1;
-        pokeAbility2.innerHTML=pokemonAbility2;
-        
-    })
-  
-    .catch(function (error) {
-        console.log(error);
-        pokemonName.innerHTML = "(An error has occurred.)";
-        pokemonImage.src = "";
-    });
+    } catch (e) {
+        console.log("Error", e)
+    }
 }
 
-var button = document.querySelector(".pokemon-button");
-var back = document.querySelector(".back-button");
-  
+chooseButton.addEventListener("click", function () {
+    flipped.classList.add("flip")
+    getPokemonData();
+});
 
-function flip() {
-    $('.card').toggleClass('flipped');
-}
-
-button.addEventListener("click", getPokemonData);
-button.addEventListener("click",flip);
-back.addEventListener("click",flip);
-
-
-
+reset.addEventListener("click", function () {
+    flipped.classList.remove("flip")
+    input.value = "";
+});
